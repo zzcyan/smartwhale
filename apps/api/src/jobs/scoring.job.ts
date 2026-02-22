@@ -55,10 +55,21 @@ export class ScoringJob implements OnModuleInit {
   ) {}
 
   /**
-   * Registra os três jobs recorrentes no Bull ao subir o módulo.
+   * Dispara o registro dos jobs em background sem bloquear o bootstrap do app.
+   * O NestJS aguarda a resolução de onModuleInit antes de abrir a porta HTTP —
+   * por isso não usamos await aqui.
+   */
+  onModuleInit(): void {
+    this.registerJobs().catch((err) =>
+      this.logger.error(`Falha ao registrar jobs: ${(err as Error).message}`),
+    )
+  }
+
+  /**
+   * Registra os três jobs recorrentes no Bull.
    * O Bull deduplicará jobs com o mesmo nome + cron (idempotente em reinicios).
    */
-  async onModuleInit(): Promise<void> {
+  private async registerJobs(): Promise<void> {
     await this.scoringQueue.add(
       ScoringJobName.RECALCULATE_SCORES,
       {},
