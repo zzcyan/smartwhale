@@ -80,6 +80,9 @@ export class IndexerService {
     // 3. Salva a transação como PENDENTE (não finalizada — SPEC.md §5 / CLAUDE.md)
     const savedTx = await this.savePendingTransaction(parsed, wallet)
 
+    // 3a. Incrementa totalOperations atomicamente (UPDATE ... SET totalOperations = totalOperations + 1)
+    await this.walletRepo.increment({ id: wallet.id }, 'totalOperations', 1)
+
     this.logger.log(
       `[IndexerService] Tx salva: ${parsed.type} ${parsed.token} | wallet: ${parsed.wallet} | $${parsed.amountUsd.toFixed(2)}`,
     )
