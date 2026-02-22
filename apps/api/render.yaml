@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: smartwhale-api
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter=@smartwhale/api build
+    startCommand: node apps/api/dist/main
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Obrigatórias — configurar manualmente no painel do Render
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: HELIUS_API_KEY
+        sync: false
+      # Futuras — adicionar conforme módulos forem implementados
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: ALCHEMY_API_KEY
+        sync: false
